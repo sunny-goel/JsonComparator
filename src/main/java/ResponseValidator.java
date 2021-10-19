@@ -1,5 +1,6 @@
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -42,15 +43,15 @@ public class ResponseValidator {
         JSONObject actualJsonObject = new JSONObject(actual);
         JSONObject expectedJsonObject = new JSONObject(expected);
         //getKey(expectedJsonObject,"name");
-        boolean isMatched = compareResponse(actualJsonObject,expectedJsonObject);
+        boolean isMatched = compareResponse(actualJsonObject, expectedJsonObject);
         System.out.println("Are actual and expected json objects matched : " + isMatched);
 
     }
 
     public static boolean compareResponse(JSONObject actual, JSONObject expected) {
-        LinkedList<ResponseValidationFailures> listOfFailures = compareResponse(actual,expected, new LinkedList<ResponseValidationFailures>());
+        LinkedList<ResponseValidationFailures> listOfFailures = compareResponse(actual, expected, new LinkedList<ResponseValidationFailures>());
         System.out.println("List Size : " + listOfFailures.size());
-        if (listOfFailures.size() > 0){
+        if (listOfFailures.size() > 0) {
             printErrorLog(listOfFailures);
             return false;
         }
@@ -68,8 +69,8 @@ public class ResponseValidator {
             String nextKey = (String) expectedKeys.next();
 
             // Check if actual response object has key or not
-            if (!actual.has(nextKey)){
-                failures.add(new ResponseValidationFailures(CHECK.EXISTENCE,nextKey,expected,actual));
+            if (!actual.has(nextKey)) {
+                failures.add(new ResponseValidationFailures(CHECK.EXISTENCE, nextKey, expected, actual));
                 continue;
             }
 
@@ -78,41 +79,39 @@ public class ResponseValidator {
 
                 // Compare json object in actual and expected response
                 if (expected.get(nextKey) instanceof JSONObject)
-                    compareResponse(actual.getJSONObject(nextKey), expected.getJSONObject(nextKey),failures);
+                    compareResponse(actual.getJSONObject(nextKey), expected.getJSONObject(nextKey), failures);
 
                     // Compare array object in actual and expected response
                 else if (expected.get(nextKey) instanceof JSONArray) {
-                    JSONArray expectedJSONArray =  expected.getJSONArray(nextKey);
-                    JSONArray actualJSONArray =  actual.getJSONArray(nextKey);
+                    JSONArray expectedJSONArray = expected.getJSONArray(nextKey);
+                    JSONArray actualJSONArray = actual.getJSONArray(nextKey);
 
                     // Check if length of array in actual and expected response are same
                     if (expectedJSONArray.length() != actualJSONArray.length())
-                        failures.add(new ResponseValidationFailures(CHECK.ARRAY_LENGTH,nextKey,expected,actual));
+                        failures.add(new ResponseValidationFailures(CHECK.ARRAY_LENGTH, nextKey, expected, actual));
 
 
-                    for (int arrayIndex = 0 ; arrayIndex < expectedJSONArray.length() ;arrayIndex ++){
+                    for (int arrayIndex = 0; arrayIndex < expectedJSONArray.length(); arrayIndex++) {
 
                         if (expectedJSONArray.get(arrayIndex) instanceof JSONObject)
-                            compareResponse(actualJSONArray.getJSONObject(arrayIndex), expectedJSONArray.getJSONObject(arrayIndex),failures);
+                            compareResponse(actualJSONArray.getJSONObject(arrayIndex), expectedJSONArray.getJSONObject(arrayIndex), failures);
 
                         else if (!expected.get(nextKey).equals(actual.get(nextKey)))
-                            failures.add(new ResponseValidationFailures(CHECK.VALUE,nextKey,expected,actual));
+                            failures.add(new ResponseValidationFailures(CHECK.VALUE, nextKey, expected, actual));
 
                     }
-                }
-
-                else if (!expected.get(nextKey).equals(actual.get(nextKey)))
-                    failures.add(new ResponseValidationFailures(CHECK.VALUE,nextKey,expected,actual));
+                } else if (!expected.get(nextKey).equals(actual.get(nextKey)))
+                    failures.add(new ResponseValidationFailures(CHECK.VALUE, nextKey, expected, actual));
 
             } else
-                failures.add(new ResponseValidationFailures(CHECK.TYPE,nextKey,expected,actual));
+                failures.add(new ResponseValidationFailures(CHECK.TYPE, nextKey, expected, actual));
         }
 
         return failures;
     }
 
     public static void printErrorLog(LinkedList<ResponseValidationFailures> failures) {
-        for (ResponseValidationFailures ResponseValidationFailures: failures) {
+        for (ResponseValidationFailures ResponseValidationFailures : failures) {
             System.out.println("------------------    ERROR   --------------------");
             if (ResponseValidationFailures.getCheckType() == CHECK.VALUE) {
                 System.out.println("VALUE OF OBJECT \"" + ResponseValidationFailures.getObjectKey() + "\" DID NOT MATCH");
@@ -122,12 +121,11 @@ public class ResponseValidator {
                 System.out.println("TYPE OF OBJECT \"" + ResponseValidationFailures.getObjectKey() + "\" DID NOT MATCH");
                 System.out.println("Expected Type : " + ResponseValidationFailures.getExpectedJsonObject().get(ResponseValidationFailures.getObjectKey()).getClass());
                 System.out.println("Actual Type : " + ResponseValidationFailures.getActualJsonObject().get(ResponseValidationFailures.getObjectKey()).getClass());
-            }else if (ResponseValidationFailures.getCheckType() == CHECK.EXISTENCE) {
+            } else if (ResponseValidationFailures.getCheckType() == CHECK.EXISTENCE) {
                 System.out.println("KEY \"" + ResponseValidationFailures.getObjectKey() + "\" IS UNAVAILABLE IN ACTUAL RESPONSE");
                 System.out.println("Expected JSON : " + ResponseValidationFailures.getExpectedJsonObject().toString());
                 System.out.println("Actual JSON : " + ResponseValidationFailures.getActualJsonObject().toString());
-            }
-            else if (ResponseValidationFailures.getCheckType() == CHECK.ARRAY_LENGTH) {
+            } else if (ResponseValidationFailures.getCheckType() == CHECK.ARRAY_LENGTH) {
                 System.out.println("NUMBER OF ITEMS IN OBJECT LIST \"" + ResponseValidationFailures.getObjectKey() + "\" DID NOT MATCH");
                 System.out.println("Expected Length : " + ResponseValidationFailures.getExpectedJsonObject().getJSONArray(ResponseValidationFailures.getObjectKey()).length());
                 System.out.println("Actual Length : " + ResponseValidationFailures.getActualJsonObject().getJSONArray(ResponseValidationFailures.getObjectKey()).length());
@@ -138,6 +136,6 @@ public class ResponseValidator {
     }
 
     public static enum CHECK {
-        VALUE,TYPE,EXISTENCE,ARRAY_LENGTH
+        VALUE, TYPE, EXISTENCE, ARRAY_LENGTH
     }
 }
