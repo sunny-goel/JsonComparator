@@ -33,7 +33,7 @@ public class ResponseValidator {
             "\t\t},\n" +
             "\t\t{\n" +
             "\t\t\t\"name\": \"Jai\",\n" +
-            "\t\t\t\"email\": \"jai87@gmail.com\"\n" +
+            "\t\t\t\"email\": \"jai87@gmxsxaail.com\"\n" +
             "\t\t}\n" +
             "\t]\n" +
             "}";
@@ -42,15 +42,12 @@ public class ResponseValidator {
 
         JSONObject actualJsonObject = new JSONObject(actual);
         JSONObject expectedJsonObject = new JSONObject(expected);
-        //getKey(expectedJsonObject,"name");
-        boolean isMatched = compareResponse(actualJsonObject, expectedJsonObject);
-        System.out.println("Are actual and expected json objects matched : " + isMatched);
+        compareResponse(actualJsonObject, expectedJsonObject);
 
     }
 
     public static boolean compareResponse(JSONObject actual, JSONObject expected) {
         LinkedList<ResponseValidationFailures> listOfFailures = compareResponse(actual, expected, new LinkedList<ResponseValidationFailures>());
-        System.out.println("List Size : " + listOfFailures.size());
         if (listOfFailures.size() > 0) {
             printErrorLog(listOfFailures);
             return false;
